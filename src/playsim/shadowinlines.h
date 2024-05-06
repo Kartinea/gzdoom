@@ -85,7 +85,12 @@ inline bool AffectedByShadows(AActor* self)
 
 inline AActor* CheckForShadows(AActor* self, AActor* other, DVector3 pos, double& penaltyFactor)
 {
-    return ((other && (other->flags & MF_SHADOW)) || (self->flags9 & MF9_DOSHADOWBLOCK)) ? P_CheckForShadowBlock(self, other, pos, penaltyFactor) : nullptr;
+	// KARTINEA: This broke invis completely since if nothing was in between the 2 actors, it would return nullptr which is treated as no aiming alteration
+	// If the other actor is shadowed then just return it
+	// This is probably not quite right, but I don't care
+	if (other && (other->flags & MF_SHADOW))
+		return other;
+    return (self->flags9 & MF9_DOSHADOWBLOCK) ? P_CheckForShadowBlock(self, other, pos, penaltyFactor) : nullptr;
 }
 
 inline AActor* PerformShadowChecks(AActor* self, AActor* other, DVector3 pos, double& penaltyFactor)
